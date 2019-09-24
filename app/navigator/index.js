@@ -1,10 +1,12 @@
 import React from 'react';
-import { TabNavigator, TabBarBottom, StackNavigator } from 'react-navigation';
+import { TabNavigator, TabBarBottom, StackNavigator, addNavigationHelpers } from 'react-navigation';
+import { connect } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../pages/home';
 import ProfileScreen from '../pages/profile';
 import LoginScreen from '../pages/login';
-import HeaderLogout from '../component/headerLogout';
+import { addListener } from '../utils/redux';
+import HeaderLogout from '../content/headerLogout';
 
 
 // TAB NAVIGATOR
@@ -35,7 +37,7 @@ const AppStack = TabNavigator({
 
 
 // STACK NAVIGATOR
-export default StackNavigator({
+export const AppNavigator = StackNavigator({
   Login: { screen: LoginScreen },
   App: { screen: AppStack },
   Home: { screen: HomeScreen },
@@ -49,3 +51,23 @@ export default StackNavigator({
     headerRight: navigation.state.routeName !== 'Login' ? <HeaderLogout navigation={navigation} navigate="Login" /> : null,
   }),
 });
+
+
+class App extends React.Component {
+  render() {
+    return (
+      <AppNavigator navigation={addNavigationHelpers({
+        dispatch: this.props.dispatch,
+        state: this.props.nav,
+        addListener,
+      })}
+      />
+    );
+  }
+}
+
+const mapStateToProps = state => ({
+  nav: state.nav,
+});
+
+export const AppWithNavigationState = connect(mapStateToProps)(App);
